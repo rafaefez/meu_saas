@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  clerkId   String    @unique
+  email     String    @unique
+  name      String?
+  plan      String    @default("free")
+  createdAt DateTime  @default(now())
+  clients   Client[]
+  products  Product[]
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  whatsapp  String?
+  niche     String?  // ex: clinica, advocacia, imobiliaria
+  status    String   @default("lead") // lead | negociacao | ativo | perdido
+  ticket    Float?   // valor mensal ou do projeto
+  notes     String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id        String   @id @default(cuid())
+  name      String
+  type      String   // 'prompts' | 'automacao' | 'copy'
+  price     Float
+  sales     Int      @default(0)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
